@@ -125,7 +125,7 @@ const PersonalInfo = () => {
             </Form.Item>
           </div>
         </div>
-        <div className="flex w-1/2 justify-end">
+        <div className="flex w-1/2 justify-end mt-5">
           <Button className="bg-primary text-white rounded-full px-10 py-3">Next</Button>
         </div>
       </Form>
