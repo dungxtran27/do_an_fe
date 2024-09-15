@@ -3,7 +3,6 @@ import HomePage from "./pages/HomePage/HomePage";
 import Login from "./pages/Auth/Login";
 import SignUp from "./pages/Auth/SignUp";
 function App() {
-  console.log('jâjạ');
   
   return (
     <BrowserRouter>
