@@ -12,14 +12,15 @@ import { authApi } from "../../../api/auth";
 import { login } from "../../../redux/slices/auth";
 import { useDispatch } from "react-redux";
 import { AxiosError } from "axios";
+import { LOGIN_DATA } from "../../../utils/const";
 interface ErrorResponse {
   error: string;
 }
 const Login = () => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const email = Form.useWatch("email", form);
-  const password = Form.useWatch("password", form);
+  const email = Form.useWatch(LOGIN_DATA.email, form);
+  const password = Form.useWatch(LOGIN_DATA.password, form);
   const navigate = useNavigate();
   const loginMutation = useMutation({
     mutationFn: () => authApi.login({ email, password }),
@@ -28,7 +29,7 @@ const Login = () => {
         message.success(data.data?.message);
       }
       dispatch(login(data.data.data));
-      navigate("/");
+      navigate("/projectOverview");
     },
     onError: (err: AxiosError<ErrorResponse>) => {
       if (err?.response?.data?.error) {

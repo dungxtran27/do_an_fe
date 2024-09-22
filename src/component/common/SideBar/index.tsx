@@ -1,20 +1,19 @@
 import classNames from "classnames";
 import styles from "./styles.module.css";
 import { DefaultRoutes } from "../../../utils/menu";
-import { Menu } from "antd";
 import SideBarItem from "./SideBarItem";
 const MenuContent = () => {
   return (
-    <div>
-      {DefaultRoutes().map((route, index) => (
-        <Menu.Item key={`${index}`}>
+    <div className={classNames(styles.customMenuItem, "flex flex-col gap-1")}>
+      {DefaultRoutes.map((route, index) => (
+        // <Menu.Item key={`${index}`}>
           <SideBarItem
             icon={route?.icon}
             name={route?.page}
             route={route?.route}
             key={index}
           />
-        </Menu.Item>
+        // </Menu.Item>
       ))}
     </div>
   );
@@ -31,10 +30,10 @@ const SideBar = () => {
         <span className="aspect-square w-8 bg-backgroundSecondary rounded-[5px]"></span>{" "}
         FSpark
       </div>
-      <div className="pt-8">
-        <Menu defaultSelectedKeys={["0"]}>
+      <div className="pt-5">
+        {/* <Menu defaultSelectedKeys={["0"]} className=""> */}
           <MenuContent />
-        </Menu>
+        {/* </Menu> */}
       </div>
     </div>
   );
