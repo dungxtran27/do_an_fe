@@ -1,25 +1,25 @@
-import { HiOutlineHome } from "react-icons/hi";
-import { IoMailOutline } from "react-icons/io5";
-import { AiOutlineTeam } from "react-icons/ai";
+import { FaChartPie } from "react-icons/fa6";
+import { FaTasks, FaRegCalendarAlt } from "react-icons/fa";
+import { FaBookJournalWhills } from "react-icons/fa6";
 export const DefaultRoutes = [
   {
     route: "/projectOverview",
     page: "Project Overview",
-    icon: <HiOutlineHome size={26}/>,
+    icon: <FaChartPie size={26}/>,
   },
   {
     route: "/dashboard",
     page: "DashBoard",
-    icon: <IoMailOutline size={26}/>,
+    icon: <FaTasks size={26}/>,
   },
   {
     route: "/class",
     page: "Class",
-    icon: <AiOutlineTeam size={26} />,
+    icon: <FaBookJournalWhills size={26} />,
   },
   {
     route: "/timeline",
     page: "Timeline",
-    icon: <AiOutlineTeam size={26} />,
+    icon: <FaRegCalendarAlt size={26} />,
   },
 ];
