@@ -1,3 +1,13 @@
 .logoWrapper {
     height: 55px;
 }
+
+.customMenuItem {
+    :global {
+        .ant-menu-item {
+            padding-inline: 0 !important;
+            background-color: aqua !important;
+        }
+       
+    }
+}
