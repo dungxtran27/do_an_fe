@@ -5,12 +5,12 @@ export const DefaultRoutes = [
   {
     route: "/projectOverview",
     page: "Project Overview",
-    icon: <FaChartPie size={20}/>,
+    icon: <FaChartPie size={20} />,
   },
   {
     route: "/dashboard",
     page: "DashBoard",
-    icon: <FaTasks size={20}/>,
+    icon: <FaTasks size={20} />,
   },
   {
     route: "/class",
