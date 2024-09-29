@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import styles from "./styles.module.css";
+import styles from "./styles.module.scss";
 import { DefaultRoutes } from "../../../utils/menu";
 import SideBarItem from "./SideBarItem";
 const MenuContent = () => {

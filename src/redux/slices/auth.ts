@@ -3,20 +3,20 @@ const authSlice = createSlice({
   name: "auth",
   initialState: {
     isLoggedIn: false,
-    userInfo: {},
+    userInfo: null,
   },
 
   reducers: {
     login: (state, action) => {
       state.isLoggedIn = true;
-      state.userInfo = { ...state.userInfo, ...action.payload };
+      state.userInfo = {  ...action.payload };
     },
     logOut: (state) => {
       state.isLoggedIn = false;
-      state.userInfo = {};
+      state.userInfo = null;
     },
     setUserInfo: (state, action) => {
-      state.userInfo = { ...state.userInfo, ...action.payload };
+      state.userInfo = { ...action.payload };
     },
   },
 });

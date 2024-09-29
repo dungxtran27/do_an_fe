@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import styles from "./style.module.css";
+import styles from "./style.module.scss";
 import logo from "../../../../public/logo.png";
 import { Button, Checkbox, Form, Input, message, Skeleton } from "antd";
 import { Link, useNavigate } from "react-router-dom";
@@ -12,7 +12,7 @@ import { authApi } from "../../../api/auth";
 import { login } from "../../../redux/slices/auth";
 import { useDispatch } from "react-redux";
 import { AxiosError } from "axios";
-import { LOGIN_DATA } from "../../../utils/const";
+import { LOGIN_DATA, ROLE } from "../../../utils/const";
 interface ErrorResponse {
   error: string;
 }
@@ -23,7 +23,7 @@ const Login = () => {
   const password = Form.useWatch(LOGIN_DATA.password, form);
   const navigate = useNavigate();
   const loginMutation = useMutation({
-    mutationFn: () => authApi.login({ email, password }),
+    mutationFn: () => authApi.login({ email, password, role: ROLE.student }),
     onSuccess: (data) => {
       if (data.data?.message) {
         message.success(data.data?.message);

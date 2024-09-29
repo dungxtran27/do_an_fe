@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import styles from "./style.module.css";
+import styles from "./style.module.scss";
 import classNames from "classnames";
 import { RootState } from "../../redux/store";
 import { useNavigate } from "react-router-dom";

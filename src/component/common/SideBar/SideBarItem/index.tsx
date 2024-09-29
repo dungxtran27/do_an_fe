@@ -12,7 +12,7 @@ const SideBarItem: React.FC<ItemProps> = ({ route, name, icon }) => {
     <div className="w-full">
       <Link to={route}>
         <div
-          className={`w-full flex items-center gap-7 text-black/55 text-[16px] font-[600] rounded-md h-[60px]  ${
+          className={`w-full flex items-center gap-4 ${ location?.pathname === route ? "text-black/90" : "text-black/55"} text-[14px] font-[600] rounded-md h-[60px]  ${
             location?.pathname === route ? "bg-[#F7F0FF]" : ""
           }`}
         >
