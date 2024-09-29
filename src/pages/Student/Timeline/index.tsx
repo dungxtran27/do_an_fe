@@ -1,11 +1,12 @@
-import { Divider, AutoComplete, Input } from "antd";
+import { Divider, AutoComplete, Input, Button } from "antd";
 import DefaultLayout from "../../../layout/DefaultLayout";
 import TimeTable from "./TimeTable";
-// import { useState } from "react";
-// import type { AutoCompleteProps } from "antd";
+import { useState } from "react";
+import type { AutoCompleteProps } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Dropdown, Space } from "antd";
+import { FaPlus } from "react-icons/fa";
 const Timeline = () => {
   const items: MenuProps["items"] = [
     {
@@ -29,7 +30,7 @@ const Timeline = () => {
   // });
 
   // const [value, setValue] = useState("");
-  // const [options, setOptions] = useState<AutoCompleteProps["options"]>([]);
+  const [options, setOptions] = useState<AutoCompleteProps["options"]>([]);
 
   // const getPanelValue = (searchText: string) =>
   //   !searchText
@@ -48,41 +49,46 @@ const Timeline = () => {
     <DefaultLayout>
       <h2 className="pl-2 pt-2">Project TimeLine</h2>
       <Divider></Divider>
-
-      <div className="flex justify-start items-center ju	">
-        <div>
-          <AutoComplete
-            className="pl-3 rounded-full border-blue-500  "
-            popupClassName="certain-category-search-dropdown"
-            popupMatchSelectWidth={500}
-            style={{ width: 250 }}
-            options={options}
-            size="large"
-          >
-            <Input.Search
+      <div className="flex justify-between">
+        <div className="flex justify-start items-center ju	">
+          <div>
+            <AutoComplete
+              className="pl-3 rounded-full border-blue-500  "
+              popupClassName="certain-category-search-dropdown"
+              popupMatchSelectWidth={500}
+              style={{ width: 250 }}
+              options={options}
               size="large"
-              placeholder="input here"
-              className="rounded-full" // Use `border-double` class if you want double borders
-            />
-          </AutoComplete>
-        </div>
+            >
+              <Input.Search
+                size="large"
+                placeholder="input here"
+                className="rounded-full" // Use `border-double` class if you want double borders
+              />
+            </AutoComplete>
+          </div>
 
-        <div>
-          <Dropdown
-            menu={{ items }}
-            trigger={["click"]}
-            placement="bottomLeft"
-            className="pl-5 mt-5"
-          >
-            <a onClick={(e) => e.preventDefault()}>
-              <Space>
-                Categories
-                <DownOutlined />
-              </Space>
-            </a>
-          </Dropdown>
+          <div>
+            <Dropdown
+              menu={{ items }}
+              trigger={["click"]}
+              placement="bottomLeft"
+              className="pl-5 mt-5"
+            >
+              <a onClick={(e) => e.preventDefault()}>
+                <Space>
+                  Categories
+                  <DownOutlined />
+                </Space>
+              </a>
+            </Dropdown>
+          </div>
         </div>
+        <Button type="primary" className="mr-4">
+          <FaPlus /> Create
+        </Button>
       </div>
+
       <TimeTable />
     </DefaultLayout>
   );
