@@ -1,5 +1,3 @@
-import { FaPlus } from "react-icons/fa6";
-
 import { ScheduleXCalendar, useCalendarApp } from "@schedule-x/react";
 import {
   createViewWeek,

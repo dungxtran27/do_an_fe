@@ -1,9 +1,9 @@
 import DefaultLayout from "../../../layout/DefaultLayout";
-
+import DashBoardWrapper from "../../../component/student/DashBoard";
 const DashBoard = () => {
   return (
     <DefaultLayout>
-      <span>This is Task screen</span>
+      <DashBoardWrapper />
     </DefaultLayout>
   );
 };

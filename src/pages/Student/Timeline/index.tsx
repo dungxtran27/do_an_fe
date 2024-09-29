@@ -1,8 +1,8 @@
 import { Divider, AutoComplete, Input, Button } from "antd";
 import DefaultLayout from "../../../layout/DefaultLayout";
 import TimeTable from "./TimeTable";
-import { useState } from "react";
-import type { AutoCompleteProps } from "antd";
+// import { useState } from "react";
+// import type { AutoCompleteProps } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Dropdown, Space } from "antd";
@@ -30,7 +30,7 @@ const Timeline = () => {
   // });
 
   // const [value, setValue] = useState("");
-  const [options, setOptions] = useState<AutoCompleteProps["options"]>([]);
+  // const [options, setOptions] = useState<AutoCompleteProps["options"]>([]);
 
   // const getPanelValue = (searchText: string) =>
   //   !searchText
@@ -57,7 +57,9 @@ const Timeline = () => {
               popupClassName="certain-category-search-dropdown"
               popupMatchSelectWidth={500}
               style={{ width: 250 }}
-              options={options}
+              // options={
+              //   // options
+              // }
               size="large"
             >
               <Input.Search
