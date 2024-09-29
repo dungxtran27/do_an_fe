@@ -1,14 +1,28 @@
-import DefaultLayout from "../../layout/DefaultLayout";
-import styles from "./style.module.css";
+import { useSelector } from "react-redux";
+import styles from "./style.module.scss";
 import classNames from "classnames";
+import { RootState } from "../../redux/store";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 const HomePage = () => {
-
+  const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/projectOverview");
+    } else {
+      navigate("/login");
+    }
+  }, [isLoggedIn, navigate]);
   return (
-    <DefaultLayout>
-      <div className={classNames(styles.testing, "text-2xl")}>
-        This is the HomePage
-      </div>
-    </DefaultLayout>
+    <div
+      className={classNames(
+        styles.testing,
+        "text-2xl justify-center pt-36 flex text-primary font-medium"
+      )}
+    >
+      This is the HomePage
+    </div>
   );
 };
 export default HomePage;
