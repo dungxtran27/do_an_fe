@@ -1,5 +1,5 @@
 import React from "react";
-import { Row, Col, Card, Typography } from "antd";
+import { Col, Card, Typography } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 
 const { Title } = Typography;
