@@ -11,8 +11,12 @@ const DefaultLayout: React.FC<LayoutProps> = ({ children }) => {
       <SideBar />
       <div className="flex-col flex flex-grow h-screen">
         <Header />
-        <div className="flex-1 bg-backgroundPrimary w-full overflow-y-scroll">
+        <div
+          className="flex-1 bg-backgroundPrimary overflow-y-scroll"
+          style={{ maxWidth: `calc(100vw - 260px)` }}
+        >
           {children}
+
         </div>
       </div>
     </div>
