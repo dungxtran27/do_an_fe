@@ -57,6 +57,13 @@ export const CREATE_TASK_FILTER = {
   timeBlock: "timeBlock",
   parentTask: "parentTask",
 };
+export const CREATE_TIMELINE = {
+  name: "name",
+  color: "color",
+  group: "group",
+  start: "start",
+  end: "end",
+};
 export const CALENDAR_CONFIG = {
   personal: {
     colorName: "personal",
