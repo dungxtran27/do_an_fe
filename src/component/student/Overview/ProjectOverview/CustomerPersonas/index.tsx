@@ -1,130 +1,164 @@
 import React, { useState } from "react";
-import { Button, Upload } from "antd";
-import {
-  UserOutlined,
-  UploadOutlined,
-  PlusOutlined,
-  EditOutlined,
-} from "@ant-design/icons";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import { Button, Card, Typography, Modal, Upload, message, Avatar } from "antd";
+import { UploadOutlined, UserOutlined } from "@ant-design/icons";
+import TextArea from "antd/es/input/TextArea";
 
-interface Persona {
-  description: string;
-  imageUrl: string | null;
-  editing: boolean;
-}
+const { Title, Text } = Typography;
 
 const CustomerPersonas: React.FC = () => {
-  const [personas, setPersonas] = useState<Persona[]>([
-    { description: "Text here", imageUrl: null, editing: false },
-    { description: "Text here", imageUrl: null, editing: false },
-  ]);
+  const [column2Infos, setColumn2Infos] = useState<string[]>([]);
+  const [column3Infos, setColumn3Infos] = useState<string[]>([]);
+  const [counter, setCounter] = useState(0);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingText, setEditingText] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
 
-  const handleInputChange = (index: number, value: string) => {
-    const newPersonas = [...personas];
-    newPersonas[index].description = value;
-    setPersonas(newPersonas);
+  const handleAddNewInfo = () => {
+    const newInfo = `New info added at ${new Date().toLocaleTimeString()}`;
+    if (counter % 2 === 0) {
+      setColumn2Infos((prevInfos) => [...prevInfos, newInfo]);
+    } else {
+      setColumn3Infos((prevInfos) => [...prevInfos, newInfo]);
+    }
+    setCounter((prevCounter) => prevCounter + 1);
   };
 
-  const toggleEditMode = (index: number) => {
-    const newPersonas = [...personas];
-    newPersonas[index].editing = !newPersonas[index].editing;
-    setPersonas(newPersonas);
+  const showModal = (text: string) => {
+    setEditingText(text);
+    setIsModalVisible(true);
   };
 
-  const handleImageUpload = (index: number, file: any) => {
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setEditingText(e.target.value);
+  };
+
+  const handleSaveText = () => {
+    message.success("Text has been updated!");
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleUploadChange = (info: any) => {
+    const file = info.file.originFileObj;
+    const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
+    if (!isJpgOrPng) {
+      message.error("You can only upload JPG/PNG file!");
+      return false;
+    }
+
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      message.error("Image must smaller than 2MB!");
+      return false;
+    }
+
     const reader = new FileReader();
-    reader.onload = (e) => {
-      const newPersonas = [...personas];
-      newPersonas[index].imageUrl = e.target?.result as string;
-      setPersonas(newPersonas);
-    };
     reader.readAsDataURL(file);
+    reader.onload = () => {
+      setImageUrl(reader.result as string);
+    };
+    return false;
   };
 
   return (
-    <div className="bg-white p-5 rounded-lg mb-6">
-      <h4 className="text-2xl font-bold mb-5">Customer Personas</h4>
-      <div className="grid grid-cols-2 gap-6 mb-6">
-        {personas.map((persona, index) => (
-          <div key={index} className="p-4 rounded-lg shadow-md">
-            <div className="flex items-center">
-              <div
-                className="w-16 h-16 rounded-full flex items-center justify-center cursor-pointer bg-gray-200 overflow-hidden"
-                onClick={() =>
-                  document.getElementById(`upload-${index}`)?.click()
-                }
-              >
-                {persona.imageUrl ? (
-                  <img
-                    src={persona.imageUrl}
-                    alt="avatar"
-                    className="object-cover w-full h-full"
-                  />
-                ) : (
-                  <UserOutlined className="text-4xl" />
-                )}
-              </div>
-
-              {persona.editing ? (
-                <div className="ml-4 flex flex-col w-full">
-                  <ReactQuill
-                    value={persona.description}
-                    onChange={(content) => handleInputChange(index, content)}
-                    className="mb-2 w-full h-full"
-                    style={{ height: "250px", width: "100%" }}
-                  />
-                  <Button type="primary" onClick={() => toggleEditMode(index)}>
-                    Save
-                  </Button>
-                </div>
-              ) : (
-                <div className="ml-4 flex flex-col">
-                  <div
-                    className="p-2 rounded-lg border border-gray-400 mb-2 max-h-52 overflow-y-auto"
-                    style={{ height: "100px", width: "400px" }}
-                    dangerouslySetInnerHTML={{ __html: persona.description }}
-                  ></div>
-                  <Button
-                    type="default"
-                    onClick={() => toggleEditMode(index)}
-                    icon={<EditOutlined />}
-                  />
-                </div>
-              )}
-            </div>
-
-            <Upload
-              id={`upload-${index}`}
-              name="avatar"
-              showUploadList={false}
-              beforeUpload={(file) => {
-                handleImageUpload(index, file);
-                return false;
-              }}
-            >
-              <Button icon={<UploadOutlined />} style={{ display: "none" }}>
-                Upload Image
-              </Button>
-            </Upload>
+    <div className="flex bg-white rounded-lg flex-row p-4 space-y-4 space-x-4 mb-6">
+      <div className="w-1/3">
+        <Title level={4} className="text-xl font-bold">
+          Customer Personas
+        </Title>
+        <Card className="shadow-lg mb-6">
+          <div
+            onClick={() => document.getElementById("upload-input")?.click()}
+            style={{ cursor: "pointer" }}
+          >
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                alt="Artist"
+                className="w-full h-80 object-cover rounded-lg mb-4"
+              />
+            ) : (
+              <Avatar
+                className="w-full h-80 object-cover rounded-lg mb-4"
+                icon={<UserOutlined style={{ fontSize: "100px" }} />}
+              />
+            )}
           </div>
-        ))}
+          <Upload
+            id="upload-input"
+            showUploadList={false}
+            onChange={handleUploadChange}
+            accept="image/*"
+          >
+            <Button icon={<UploadOutlined />} style={{ display: "none" }}>
+              Upload
+            </Button>
+          </Upload>
+
+          <Title
+            level={3}
+            onClick={() => showModal("Thông tin cá nhân")}
+            style={{ cursor: "pointer" }}
+          >
+            Thông tin cá nhân
+          </Title>
+          <Text
+            onClick={() => showModal("Đây là một cô gái da xanh")}
+            style={{ cursor: "pointer" }}
+          >
+            Đây là một cô gái da xanh
+          </Text>
+        </Card>
+        <Button type="primary" onClick={handleAddNewInfo}>
+          Add New Info
+        </Button>
       </div>
-      <Button
-        type="dashed"
-        icon={<PlusOutlined />}
-        size="large"
-        className="flex items-center"
-        onClick={() =>
-          setPersonas([
-            ...personas,
-            { description: "Text here", imageUrl: null, editing: false },
-          ])
-        }
+
+      <div className="w-1/3">
+        <div className="grid grid-cols-1 gap-4">
+          {column2Infos.map((index) => (
+            <Card key={index} className="shadow-lg">
+              <Title
+                onClick={() => showModal("Thông tin cá nhân")}
+                style={{ cursor: "pointer" }}
+                level={4}
+              >
+                Tiêu Đề
+              </Title>
+              <Text
+                onClick={() => showModal("Thông tin cá nhân")}
+                style={{ cursor: "pointer" }}
+              >
+                Nội dung
+              </Text>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      <div className="w-1/3">
+        <div className="grid grid-cols-1 gap-4">
+          {column3Infos.map((index) => (
+            <Card key={index} className="shadow-lg">
+              <Title level={4}>Tiêu Đề</Title>
+              <Text>Nội dung</Text>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      <Modal
+        title="Chỉnh sửa thông tin"
+        open={isModalVisible}
+        onOk={handleSaveText}
+        onCancel={handleCancel}
+        style={{ top: 150, left: 50, right: 50 }}
       >
-        Create new
-      </Button>
+        <TextArea value={editingText} onChange={handleTextChange} rows={10} />
+      </Modal>
     </div>
   );
 };
