@@ -36,8 +36,12 @@ const People = () => {
       <div>
         <span className="text-[16px] font-semibold">Teachers</span>
         <div className="flex flex-col">
-          {teachers.map((t) => (
-            <div className="flex items-center justify-between w-full border-b border-b-black/20 py-2">
+          {teachers.map((t, index) => (
+            <div
+              className={`flex items-center justify-between w-full ${
+                index < teachers.length - 1 ? "border-b" : ""
+              } border-b-black/20 py-2`}
+            >
               <div className="flex items-center justify-between gap-3">
                 <img
                   src={t.profilePicture}

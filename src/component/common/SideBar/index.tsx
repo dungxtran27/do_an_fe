@@ -72,9 +72,7 @@ const SideBar: React.FC<HeaderProps> = () => {
                 <span className="text-[14px] font-semibold">
                   {userInfo?.name}
                 </span>
-                <Tooltip title={"GD1715_AD - Ten nhomadadaadadadadad"}>
-                  <span className="text-[12px] truncate">GD1715_AD - Ten nhomadadaadadadadad</span>
-                </Tooltip>
+                  <span className="text-[12px] truncate">Student</span>
               </div>
             </div>
             <Tooltip title={"log out"} className="cursor-pointer w-1/6">
