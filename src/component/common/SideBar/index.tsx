@@ -8,6 +8,8 @@ import { UserInfo } from "../../../model/auth";
 import { IoMdExit } from "react-icons/io";
 import { Tooltip } from "antd";
 import React from "react";
+import { Image } from "antd";
+import logo_header from "../../../../public/logo_header.png";
 interface RouteProps {
   route: string;
   page: string;
@@ -41,15 +43,15 @@ const SideBar: React.FC<HeaderProps> = () => {
   return (
     <div className="h-screen w-[260px] flex flex-col justify-between">
       <div>
-        <div
-          className={classNames(
-            styles.logoWrapper,
-            "border-r-[1px] z-10 border-b-[1px] border-backgroundSecondary flex items-center px-3 gap-3 font-medium text-lg"
-          )}
-        >
-          <span className="aspect-square w-8 bg-backgroundSecondary rounded-[5px]"></span>{" "}
-          FSpark
-        </div>
+      <div
+        className={classNames(
+          styles.logoWrapper,
+          "border-r-[1px] z-10 border-b-[1px] border-backgroundSecondary flex items-center px-3 gap-3 font-medium text-lg"
+        )}
+      >
+        <Image width={60} preview={false} src={logo_header} />
+        FSpark
+      </div>
         <div className="pt-5">
           <MenuContent routes={DefaultRoutes} />
         </div>
