@@ -1,5 +1,7 @@
 import Report from "../component/student/DashBoard/Report";
 import Task from "../component/student/DashBoard/Task";
+import Overview from "../component/student/Overview/ProjectOverview";
+import Outcome from "../component/student/Overview/Outcome";
 
 export const LOGIN_DATA = {
   email: "email",
@@ -118,3 +120,8 @@ export const CALENDAR_CONFIG = {
     },
   },
 };
+
+export const OVERVIEW_TABS = [
+  { key: "overview", label: "Overview", children: <Overview /> },
+  { key: "outcome", label: "Outcome", children: <Outcome /> },
+];

@@ -5,6 +5,7 @@ export interface UserInfo {
   gen: number;
   major: string;
   account: Account;
+  group: string;
 };
 export interface Account {
     id: string,
