@@ -4,6 +4,7 @@ import Overview from "../component/student/Overview/ProjectOverview";
 import Outcome from "../component/student/Overview/Outcome";
 import Outcomes from "../component/student/Class/Outcomes";
 import People from "../component/student/Class/People";
+import Stream from "../component/student/Class/Stream";
 
 export const LOGIN_DATA = {
   email: "email",
@@ -21,8 +22,8 @@ export const DASHBOARD_TABS = [
 ];
 export const CLASS_TABS = [
   { key: "outcomes", label: "Outcomes", children: <Outcomes /> },
-  { key: "stream", label: "Stream", children: <></> },
-  { key: "people", label: "People", children: <People/> },
+  { key: "stream", label: "Stream", children: <Stream /> },
+  { key: "people", label: "People", children: <People /> },
 ];
 export const TASK_STATUS_FILTER = [
   {
