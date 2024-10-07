@@ -4,7 +4,7 @@ import { TASK_STATUS_FILTER } from "../../../../../utils/const";
 import { CiSquarePlus } from "react-icons/ci";
 import { TaskBoardData } from "../../../../../model/taskBoard";
 import React from "react";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 interface TaskBoardProps {
   taskBoardData: TaskBoardData[];
   setOpenCreateTask: (open: boolean) => void;
@@ -56,7 +56,6 @@ const TaskBoard: React.FC<TaskBoardProps> = ({
     return {
       key: tb.key,
       taskType: tb.taskType,
-      taskKey: <Link className="hover:underline" to={`/taskDetail/${tb.taskKey}`}>{tb.taskKey}</Link>,
       name: tb.name,
       assignee: (
         <div className="flex items-center gap-2 font-semibold">
@@ -70,98 +69,40 @@ const TaskBoard: React.FC<TaskBoardProps> = ({
         </div>
       ),
       status: statusSelect(tb?.status),
-      timeblock: (
-        <span
-          className="rounded-md py-1 px-5 text-white"
-          style={{ backgroundColor: tb?.timeblock?.color }}
-        >
-          {tb?.timeblock?.name}
-        </span>
-      ),
       dueDate: tb?.dueDate ? dayjs(tb?.dueDate).format("MMM D, YYYY") : "",
     };
   });
-
-  //   const dataSource = [
-  //     {
-  //       key: "1",
-  //       taskType: "Group task",
-  //       taskKey: "SE01",
-  //       name: "Tạo timeline marketing",
-  //       assignee: (
-  //         <div className="flex items-center gap-2 font-semibold">
-  //           <span className="bg-[#f43f5e] rounded-full w-7 text-center leading-7 text-white aspect-square">
-  //             SC
-  //           </span>
-  //           <span>Sơn Chu</span>
-  //         </div>
-  //       ),
-  //       status: statusSelect("Need Review"),
-  //       timeblock: (
-  //         <span className="bg-lime-400 rounded-md py-1 px-5 text-white">
-  //           Project init
-  //         </span>
-  //       ),
-  //       dueDate: dayjs().format("MMM D, YYYY"),
-  //     },
-  //     {
-  //       key: "2",
-  //       taskType: "Class task",
-  //       taskKey: "SE02",
-  //       name: "Outcome 1",
-  //       assignee: (
-  //         <div className="flex items-center gap-2 font-semibold">
-  //           <span className="bg-yellow-400 rounded-full w-7 text-center leading-7 text-white aspect-square">
-  //             TD
-  //           </span>
-  //           <span>Trần Dũng</span>
-  //         </div>
-  //       ),
-  //       status: statusSelect("In Progress"),
-  //       timeblock: (
-  //         <span className="bg-violet-400 rounded-md py-1 px-5 text-white">
-  //           Outcome 1
-  //         </span>
-  //       ),
-  //       dueDate: dayjs().format("MMM D, YYYY"),
-  //     },
-  //   ];
-
   const columns = [
     {
       title: "Task type",
       dataIndex: "taskType",
       key: "taskType",
-    },
-    {
-      title: "Key",
-      dataIndex: "taskKey",
-      key: "taskKey",
+      className: "w-1/6",
     },
     {
       title: "Name",
       dataIndex: "name",
       key: "name",
+      className: "w-2/6",
+      render: (text:string) => <strong className="hover:underline hover:text-sky-500 cursor-pointer">{text}</strong>,
     },
     {
       title: "Assignee",
       dataIndex: "assignee",
       key: "assignee",
+      className: "w-1/6",
     },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
-    },
-    {
-      title: "Time block",
-      dataIndex: "timeblock",
-      key: "timeblock",
+      className: "w-1/6",
     },
     {
       title: "Due date",
       dataIndex: "dueDate",
       key: "dueDate",
+      className: "w-1/6",
     },
   ];
   return (

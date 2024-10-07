@@ -1,7 +1,6 @@
 export interface TaskBoardData {
     key: string,
     taskType: string,
-    taskKey: string,
     name: string,
     assignee?: {
         color: string,
@@ -9,10 +8,5 @@ export interface TaskBoardData {
         id?: string
     },
     status: string,
-    timeblock?: {
-        color: string,
-        name: string,
-        id?: string
-    }
     dueDate?: Date
 }
