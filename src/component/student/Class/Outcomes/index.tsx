@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import styles from "./styles.module.scss";
+import styles from "./style.module.scss";
 import dayjs from "dayjs";
 import { useState } from "react";
 import { Checkbox, Divider, message, Tooltip, UploadProps } from "antd";
@@ -15,7 +15,6 @@ const outcomeList = [
     grade: 9,
     name: "Build physical product/service",
     gradingCriteria: ["demo", "demo", "demo"],
-    statusColor: "#f87171",
     attachment:
       "https://e0.pxfuel.com/wallpapers/744/1020/desktop-wallpaper-aurora-running-with-the-wolves-official-audio-wolf-aurora.jpg",
   },
@@ -27,7 +26,6 @@ const outcomeList = [
     name: "Build physical product/service 2",
     gradingCriteria: ["demo", "demo", "demo"],
     isActive: true,
-    statusColor: "#38bdf8",
     // attachment:
     //   "https://e0.pxfuel.com/wallpapers/744/1020/desktop-wallpaper-aurora-running-with-the-wolves-official-audio-wolf-aurora.jpg",
   },
@@ -38,7 +36,6 @@ const outcomeList = [
     grade: null,
     name: "Build physical product/service",
     gradingCriteria: ["demo", "demo", "demo"],
-    statusColor: "#fbbf24",
     // attachment: "https://e0.pxfuel.com/wallpapers/744/1020/desktop-wallpaper-aurora-running-with-the-wolves-official-audio-wolf-aurora.jpg"
   },
 ];
@@ -67,7 +64,7 @@ const List = ({ setViewingOutcome }: { setViewingOutcome: any }) => {
 
   return (
     <div className="w-full">
-      <div className={`w-full grid grid-cols-${outcomeList.length} gap-5`}>
+      <div className={`w-full grid grid-cols-3 gap-5`}>
         {outcomeList.map((oc, index) => (
           <div
             // key={index}
@@ -149,7 +146,7 @@ const OutcomeDetail = ({ oc }: { oc: any }) => {
           <div className="font-medium">Grading Criteria</div>
           <div className="flex flex-col gap-2 p-3">
             {oc.gradingCriteria.map((gc: any) => (
-              <Checkbox checked>{gc}</Checkbox>
+              <Checkbox checked={false}>{gc}</Checkbox>
             ))}
           </div>
         </div>
