@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Image, Modal } from "antd";
+import { Modal } from "antd";
 import { Typography } from "antd";
 const { Text } = Typography;
 interface CommentModalProps {
@@ -25,13 +24,8 @@ const CommentModal: React.FC<CommentModalProps> = ({
     <Modal title="Comment" open={open} onCancel={handleCancel}>
       {comments.map((c) => (
         <div className="stream_cmt_body pt-3">
-          <div className="flex">
-            <Image
-              //   width={30}
-              preview={false}
-              className="w-[40px] rounded-full"
-              src={c.avatar}
-            />
+          <div className="flex items-start">
+            <img className="w-[35px] rounded-full" src={c.avatar} />
             <div className="ml-3">
               <div className="flex j">
                 <div className="font-semibold">{c.username}</div>
