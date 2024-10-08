@@ -193,7 +193,7 @@ const BusinessModelCanvas: React.FC = () => {
   };
 
   return (
-    <div className="bg-white p-8 rounded-lg flex flex-col justify-center mb-6">
+    <div className="bg-white p-8 mt-5 rounded-lg flex flex-col justify-center mb-6">
       <Title level={4} className="font-bold">
         Business Model Canvas
       </Title>

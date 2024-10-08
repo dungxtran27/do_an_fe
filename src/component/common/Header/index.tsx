@@ -1,25 +1,21 @@
 import classNames from "classnames";
 import styles from "./style.module.scss";
-import { IoIosSearch } from "react-icons/io";
-import { Input } from "antd";
+import { Tooltip } from "antd";
 // import { userInfo } from "../../../model/auth";
 
 const Header = () => {
-
-
   return (
     <div
       className={classNames(
-        "border-backgroundSecondary shadow-md shadow-backgroundSecondary/40 z-10 flex items-center pl-[50px] justify-between pr-[40px]",
+        "border-backgroundSecondary shadow-md shadow-backgroundSecondary/40 z-10 flex items-center pl-[20px] justify-between pr-[40px]",
         styles.headerWrapper
       )}
     >
-      <Input
-        prefix={<IoIosSearch className="text-primary" />}
-        size="large"
-        className="rounded-full w-[450px] border-primary"
-        placeholder="Search"
-      />
+      <Tooltip className="max-w-[70%]" title={"GD1715_AD / Ăn vặt kiểu Nhật - Maneki chan"}>
+        <span className="text-[16px] font-semibold truncate">
+          GD1715_AD / Ăn vặt kiểu Nhật - Maneki chan
+        </span>
+      </Tooltip>
     </div>
   );
 };
