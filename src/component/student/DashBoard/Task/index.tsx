@@ -1,128 +1,179 @@
-import { useState } from "react";
-import { TASK_FILTERS, TASK_STATUS_FILTER } from "../../../../utils/const";
-import { Button, Form, Input, Select, Tooltip } from "antd";
-import styles from "./styles.module.scss";
-import FormItem from "antd/es/form/FormItem";
+import { useEffect, useState } from "react";
+import { Button, Form, Input, message, Select, Tooltip } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { FaFileExcel } from "react-icons/fa6";
-import TaskBoard from "./TaskBoard";
 import classNames from "classnames";
+import styles from "./styles.module.scss";
+import TaskBoard from "./TaskBoard";
 import CreateTask from "./CreateTask";
-// type LabelRender = SelectProps["labelRender"];
+import { TASK_FILTERS, TASK_STATUS_FILTER } from "../../../../utils/const";
+import { taskApi } from "../../../../api/apiTask";
+import { studentApi } from "../../../../api/apiStudent";
+import { Student } from "../../../../model/student";
+import { AxiosError } from "axios";
+import FormItem from "antd/es/form/FormItem";
+
 const Task = () => {
   const [status, setStatus] = useState<string>("All");
   const [memberSearch, setMemberSearch] = useState<string>("");
   const [openCreateTask, setOpenCreateTask] = useState<boolean>(false);
-  const statusFilter = () => {
-    return (
-      <div className="flex items-center text gap-5">
-        <span className="text-[16px] font-semibold">Status: </span>
-        <span className="flex gap-3">
-          {TASK_STATUS_FILTER.map((s) => (
-            <span
-              key={s.value}
-              className={`${
-                status === s.value ? "text-white bg-primary" : ``
-              } px-5 py-1 text-center rounded-full cursor-pointer`}
-              //   style={{
-              //     backgroundColor: status === s.value ? s.color : "transparent",
-              //     color: status === s.value ? "white" : s.color,
-              //   }}
-              onClick={() => {
-                setStatus(s.value);
-              }}
-            >
-              {s.value}
-            </span>
-          ))}
-        </span>
-      </div>
-    );
-  };
+  const [taskBoardData, setTaskBoardData] = useState<any[]>([]);
+  const [groupId, setGroupId] = useState<string>("");
+  const [members, setMembers] = useState<{ value: string; label: string }[]>([]);
   const [form] = Form.useForm();
-  // const taskType = Form.useWatch(TASK_FILTERS.taskType, form);
-  // const assignee = Form.useWatch(TASK_FILTERS.assignee, form);
-  // const searchKey = Form.useWatch(TASK_FILTERS.searchKey, form);
 
-  const taskFilter = () => {
-    const members = [
-      { value: "chuson", label: "Chu Son" },
-      { value: "trandung", label: "trandung" },
-      { value: "huy", label: "huy" },
-      { value: "hieu", label: "hieu" },
-      { value: "thang", label: "thang" },
-    ];
+  const [taskDetails, setTaskDetails] = useState<any>(null); // State for task details modal
+  const [visible, setVisible] = useState(false);
 
-    return (
-      <Form
-        className="flex items-center gap-4 mt-5"
-        form={form}
-        layout="vertical"
-      >
-        <FormItem name={TASK_FILTERS.taskType} label={"Task type"}>
-          <Select
-            size="middle"
-            style={{ width: 180 }}
-            allowClear
-            options={[
-              { value: "classwork", label: "Class work" },
-              { value: "grouptask", label: "Group task" },
-            ]}
-          />
-        </FormItem>
-        <FormItem name={TASK_FILTERS.assignee} label={"Assignee"}>
-          <Select
-            size="middle"
-            style={{ width: 280 }}
-            options={members}
-            showSearch
-            mode="multiple"
-            maxTagCount={"responsive"}
-            searchValue={memberSearch}
-            onSearch={setMemberSearch}
-            maxTagPlaceholder={(omittedValues) => (
-              <Tooltip
-                overlayStyle={{ pointerEvents: "none" }}
-                title={omittedValues.map(({ label }) => label).join(", ")}
-              >
-                <span>+{omittedValues.length}</span>
-              </Tooltip>
-            )}
-          />
-        </FormItem>
-        <FormItem name={TASK_FILTERS.searchKey} label={"Search"}>
-          <Input
-            suffix={<SearchOutlined />}
-            placeholder="Search task by code or name"
-            style={{ width: 230 }}
-          />
-        </FormItem>
-      </Form>
-    );
+  interface ErrorResponse {
+    error: string;
+  }
+  const handleTaskTypeFilter = (type: string) => {
+    setTaskType(type);
   };
-  const taskBoardData = [
-    {
-      key: "1",
-      taskType: "Group Task",
-      name: "Tạo timeline cho marketing",
+  const handleStatusFilter = (statusValue: string) => {
+    setStatus(statusValue);
+  };
+  const [taskType, setTaskType] = useState<string | undefined>(undefined);
+  const [assignees, setAssignees] = useState<string[]>([]);
+  const [searchKey, setSearchKey] = useState<string>("");
+  const [allTasks, setAllTasks] = useState<any[]>([]); 
+
+  // Fetch group ID (assumed to be a static value for demonstration)
+  useEffect(() => {
+    const fetchedGroupId = "66fdfef2a92810edf9f145c8";
+    setGroupId(fetchedGroupId);
+  }, []);
+
+  // Fetch all tasks and members only once
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [tasksResponse, membersResponse] = await Promise.all([
+          taskApi.getTasksByGroup(groupId),
+          studentApi.getStudentsInSameGroup(),
+        ]);
+        
+        // Set all tasks and members
+        setAllTasks(tasksResponse.data);
+        const students = membersResponse.data.data || [];
+        const memberOptions = students.map((student: Student) => ({
+          value: student._id,
+          label: student.name,
+        }));
+        setMembers(memberOptions);
+
+        // Immediately filter tasks after fetching
+        filterTasks(tasksResponse.data);
+      } catch (err) {
+        const axiosError = err as AxiosError<ErrorResponse>;
+        message.error(axiosError.response?.data?.error);
+      }
+    };
+
+    if (groupId) {
+      fetchData();
+    }
+  }, [groupId]);
+
+  const filterTasks = (tasks: any[]) => {
+    const filteredTasks = tasks.filter((task) => {
+      const matchesType = taskType ? task.taskType === taskType : true;
+      const matchesAssignee = assignees.length ? assignees.includes(task.assignee?._id) : true;
+      const matchesSearchKey = searchKey ? task.taskName.toLowerCase().includes(searchKey.toLowerCase()) : true;
+      const matchesStatus = status && status !== "All" ? task.status === status : true;
+
+      return matchesType && matchesAssignee && matchesSearchKey && matchesStatus;
+    }).map((task) => ({
+      taskType: task.taskType,
+      name: task.taskName,
       assignee: {
-        color: "#e11d48",
-        name: "Sơn Chu",
+        name: task.assignee?.name
+          ? task.assignee.name.split(' ').slice(0, 1).join(' ') + ' ' + task.assignee.name.split(' ').pop()
+          : '',
+        color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
       },
-      status: "In Progress",
-      dueDate: new Date(),
-    },
-    {
-      key: "2",
-      taskType: "Class Task",
-      name: "Outcome 2",
-      assignee: {
-        color: "#fb923c",
-        name: "Trần Dũng",
-      },
-      status: "Need Review",
-    },
-  ];
+      status: task.status,
+      dueDate: task.dueDate ? new Date(task.dueDate) : null,
+    }));
+
+    setTaskBoardData(filteredTasks);
+  };
+
+  useEffect(() => {
+    filterTasks(allTasks);
+  }, [taskType, assignees, searchKey, status, allTasks]);
+
+  const statusFilter = () => (
+    <div className="flex items-center text gap-5">
+      <span className="text-[16px] font-semibold">Status: </span>
+      <span className="flex gap-3">
+        {TASK_STATUS_FILTER.map((s) => (
+          <span
+            key={s.value}
+            className={`${status === s.value ? "text-white bg-primary" : ''} px-5 py-1 text-center rounded-full cursor-pointer`}
+            onClick={() => handleStatusFilter(s.value)}
+          >
+            {s.label} 
+          </span>
+        ))}
+      </span>
+    </div>
+  );
+
+  const taskFilter = () => (
+    <Form className="flex items-center gap-4 mt-5" form={form} layout="vertical">
+      <FormItem name={TASK_FILTERS.taskType} label={"Task type"}>
+        <Select
+          size="middle"
+          style={{ width: 180 }}
+          allowClear
+          onChange={(value) => {
+            setTaskType(value);
+          }}
+          options={[
+            { value: "class work", label: "Class work" },
+            { value: "group work", label: "Group task" },
+          ]}
+        />
+      </FormItem>
+      <Form.Item name={TASK_FILTERS.assignee} label={"Assignee"}>
+        <Select
+          size="middle"
+          style={{ width: 280 }}
+          options={members}
+          showSearch
+          mode="multiple"
+          maxTagCount={"responsive"}
+          value={assignees}
+          onChange={(value) => {
+            setAssignees(value);
+          }}
+          onSearch={setMemberSearch}
+          maxTagPlaceholder={(omittedValues) => (
+            <Tooltip
+              overlayStyle={{ pointerEvents: "none" }}
+              title={omittedValues.map(({ label }) => label).join(", ")}
+            >
+              <span>+{omittedValues.length}</span>
+            </Tooltip>
+          )}
+        />
+      </Form.Item>
+      <Form.Item name={TASK_FILTERS.searchKey} label={"Search"}>
+        <Input
+          suffix={<SearchOutlined />}
+          placeholder="Search task by code or name"
+          style={{ width: 230 }}
+          value={searchKey}
+          onChange={(e) => {
+            setSearchKey(e.target.value);
+          }}
+        />
+      </Form.Item>
+    </Form>
+  );
+
   return (
     <div>
       {statusFilter()}
@@ -143,4 +194,5 @@ const Task = () => {
     </div>
   );
 };
+
 export default Task;
