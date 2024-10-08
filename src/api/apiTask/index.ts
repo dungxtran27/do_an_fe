@@ -18,8 +18,18 @@ interface Task {
 }
 
 interface TaskResponse {
+  status: number;
   data: Task;
 }
+interface CreateTaskData {
+    taskName: string;
+    description: string;
+    assignee: string;
+    dueDate?: Date;
+    attachment?: string;
+    parentTask?: string;
+    // group?: string;
+  }
 
 export const taskApi = {
   getTaskDetail: (taskId: string): Promise<TaskResponse> => {
@@ -35,7 +45,9 @@ export const taskApi = {
     return axios.get(`/api/task/viewTaskByGroup/${groupId}?${queryString}`);
   },
 
-  createTask: (taskData: Task): Promise<TaskResponse> => {
+  createTask: (taskData: CreateTaskData): Promise<TaskResponse> => {
     return axios.post(`/api/task/create`, taskData);
   },
+
+  
 };

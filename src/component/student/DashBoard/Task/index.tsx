@@ -22,15 +22,9 @@ const Task = () => {
   const [members, setMembers] = useState<{ value: string; label: string }[]>([]);
   const [form] = Form.useForm();
 
-  const [taskDetails, setTaskDetails] = useState<any>(null); // State for task details modal
-  const [visible, setVisible] = useState(false);
-
   interface ErrorResponse {
     error: string;
   }
-  const handleTaskTypeFilter = (type: string) => {
-    setTaskType(type);
-  };
   const handleStatusFilter = (statusValue: string) => {
     setStatus(statusValue);
   };
@@ -39,13 +33,11 @@ const Task = () => {
   const [searchKey, setSearchKey] = useState<string>("");
   const [allTasks, setAllTasks] = useState<any[]>([]); 
 
-  // Fetch group ID (assumed to be a static value for demonstration)
   useEffect(() => {
     const fetchedGroupId = "66fdfef2a92810edf9f145c8";
     setGroupId(fetchedGroupId);
   }, []);
 
-  // Fetch all tasks and members only once
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -54,7 +46,6 @@ const Task = () => {
           studentApi.getStudentsInSameGroup(),
         ]);
         
-        // Set all tasks and members
         setAllTasks(tasksResponse.data);
         const students = membersResponse.data.data || [];
         const memberOptions = students.map((student: Student) => ({
@@ -63,7 +54,6 @@ const Task = () => {
         }));
         setMembers(memberOptions);
 
-        // Immediately filter tasks after fetching
         filterTasks(tasksResponse.data);
       } catch (err) {
         const axiosError = err as AxiosError<ErrorResponse>;
@@ -149,6 +139,7 @@ const Task = () => {
           onChange={(value) => {
             setAssignees(value);
           }}
+          searchValue={memberSearch}
           onSearch={setMemberSearch}
           maxTagPlaceholder={(omittedValues) => (
             <Tooltip
@@ -190,7 +181,7 @@ const Task = () => {
           setOpenCreateTask={setOpenCreateTask}
         />
       </div>
-      <CreateTask open={openCreateTask} setOpen={setOpenCreateTask} />
+      <CreateTask open={openCreateTask} setOpen={setOpenCreateTask}/>
     </div>
   );
 };

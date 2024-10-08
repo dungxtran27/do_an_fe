@@ -56,8 +56,8 @@ export const CREATE_TASK_FILTER = {
   assignee: "assignee",
   dueDate: "dueDate",
   attachment: "attachment",
-  timeBlock: "timeBlock",
   parentTask: "parentTask",
+  
 };
 export const CREATE_TIMELINE = {
   name: "name",
