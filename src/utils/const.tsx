@@ -133,3 +133,14 @@ export const OVERVIEW_TABS = [
   { key: "overview", label: "Overview", children: <Overview /> },
   { key: "outcome", label: "Outcome", children: <Outcome /> },
 ];
+export const TASK_TYPE = {
+  CLASS_WORK: "Class work",
+  GROUP_WORK: "Group task",
+};
+export const QUERY_KEY = {
+  GROUP_CUSTOMER_JOURNEY_MAP: "groupCustomerJourneyMap",
+  REFRESH_TOKEN: "refreshToken",
+  TASKS_BOARD: "tasksBoard",
+  STUDENT_OF_GROUP: "studentOfGroup",
+  OUTCOMES_LIST: "outcomesList"
+};

@@ -9,4 +9,7 @@ export const authApi = {
   login: async (credential: loginProps) => {
     return await axios.post(`api/auth/login`, credential);
   },
+  refreshToken: async () => {
+    return await axios.get("api/auth/refreshToken");
+  },
 };

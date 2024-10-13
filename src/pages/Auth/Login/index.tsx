@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import styles from "./style.module.scss";
 import logo from "../../../../public/logo.png";
-import { Button, Checkbox, Form, Input, message, Skeleton } from "antd";
+import { Button, Checkbox, Form, Input, Skeleton } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { BiLogoGmail } from "react-icons/bi";
 import { FaUnlockAlt } from "react-icons/fa";
@@ -11,11 +11,10 @@ import { useMutation } from "@tanstack/react-query";
 import { authApi } from "../../../api/auth";
 import { login } from "../../../redux/slices/auth";
 import { useDispatch } from "react-redux";
-import { AxiosError } from "axios";
 import { LOGIN_DATA, ROLE } from "../../../utils/const";
-interface ErrorResponse {
-  error: string;
-}
+// interface ErrorResponse {
+//   error: string;
+// }
 const Login = () => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
@@ -25,16 +24,8 @@ const Login = () => {
   const loginMutation = useMutation({
     mutationFn: () => authApi.login({ email, password, role: ROLE.student }),
     onSuccess: (data) => {
-      if (data.data?.message) {
-        message.success(data.data?.message);
-      }
       dispatch(login(data.data.data));
       navigate("/projectOverview");
-    },
-    onError: (err: AxiosError<ErrorResponse>) => {
-      if (err?.response?.data?.error) {
-        message.error(err?.response?.data?.error);
-      }
     },
   });
 

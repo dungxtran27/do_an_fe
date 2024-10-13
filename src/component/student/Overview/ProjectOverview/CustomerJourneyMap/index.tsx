@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useState } from "react";
 import {
   Card,
   Typography,
@@ -11,12 +11,12 @@ import {
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { customerJourneyMapApi } from "../../../../../api/apiOverview/customerJourneyMap";
-import { useMutation } from "@tanstack/react-query";
-import { AxiosError } from "axios";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import TextArea from "antd/es/input/TextArea";
 import { UserInfo } from "../../../../../model/auth";
 import { RootState } from "../../../../../redux/store";
 import { useSelector } from "react-redux";
+import { QUERY_KEY } from "../../../../../utils/const";
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -39,15 +39,15 @@ interface Cell {
   content: string;
 }
 
-interface CustomerJourneyMapData {
-  cols: Cols[];
-  rows: Rows[];
-  cells: Cell[];
-}
+// interface CustomerJourneyMapData {
+//   cols: Cols[];
+//   rows: Rows[];
+//   cells: Cell[];
+// }
 
-interface ErrorResponse {
-  error: string;
-}
+// interface ErrorResponse {
+//   error: string;
+// }
 
 const colorOptions = [
   "#b2e5c6",
@@ -91,18 +91,11 @@ function lightenColor(color: string, percent: number) {
 }
 
 const CustomerJourneyMap: React.FC = () => {
-  const [customerJourneyData, setCustomerJourneyData] =
-    useState<CustomerJourneyMapData>({
-      cols: [],
-      rows: [],
-      cells: [],
-    });
-    
   const userInfo = useSelector(
     (state: RootState) => state.auth.userInfo
   ) as UserInfo | null;
 
-  const groupId = userInfo?.group ?? ''
+  const groupId = userInfo?.group ?? "";
 
   const [isRowModalVisible, setIsRowModalVisible] = useState(false);
   const [isColModalVisible, setIsColModalVisible] = useState(false);
@@ -113,23 +106,15 @@ const CustomerJourneyMap: React.FC = () => {
   const [newColName, setNewColName] = useState("");
   const [newColColor, setNewColColor] = useState("");
   const [cellContent, setCellContent] = useState("");
-
-  const fetchCustomerJourneyMap = async () => {
-    try {
-      const response = await customerJourneyMapApi.getCustomerJourneyMap(
-        groupId
-      );
-      setCustomerJourneyData(response.data.data.customerJourneyMap);
-    } catch (err) {
-      const axiosError = err as AxiosError<ErrorResponse>;
-      message.error(axiosError.response?.data?.error);
-    }
-  };
-
-  useEffect(() => {
-    fetchCustomerJourneyMap();
-  }, [groupId]);
-
+  const queryClient = useQueryClient();
+  const {
+    data: customerJourneyMapData,
+  } = useQuery({
+    queryKey: [QUERY_KEY.GROUP_CUSTOMER_JOURNEY_MAP, groupId],
+    queryFn: async () => {
+      return await customerJourneyMapApi.getGroupData(groupId);
+    },
+  });
   const editColumnMutation = useMutation({
     mutationFn: (editedCol: {
       colId: string;
@@ -145,7 +130,6 @@ const CustomerJourneyMap: React.FC = () => {
     onSuccess: () => {
       message.success("Column updated successfully");
       setIsColModalVisible(false);
-      fetchCustomerJourneyMap();
     },
     onError: () => {
       message.error("Failed to update column.");
@@ -157,7 +141,9 @@ const CustomerJourneyMap: React.FC = () => {
       customerJourneyMapApi.deleteColContentCustomerJourneyMap(groupId, colId),
     onSuccess: () => {
       message.success("Column deleted successfully");
-      fetchCustomerJourneyMap();
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEY.GROUP_CUSTOMER_JOURNEY_MAP],
+      });
       setIsColModalVisible(false);
     },
     onError: () => {
@@ -175,7 +161,9 @@ const CustomerJourneyMap: React.FC = () => {
     onSuccess: () => {
       message.success("Row updated successfully");
       setIsRowModalVisible(false);
-      fetchCustomerJourneyMap();
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEY.GROUP_CUSTOMER_JOURNEY_MAP],
+      });
     },
     onError: () => {
       message.error("Failed to update row.");
@@ -187,7 +175,9 @@ const CustomerJourneyMap: React.FC = () => {
       customerJourneyMapApi.deleteRowContentCustomerJourneyMap(groupId, rowId),
     onSuccess: () => {
       message.success("Row deleted successfully");
-      fetchCustomerJourneyMap();
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEY.GROUP_CUSTOMER_JOURNEY_MAP],
+      });
       setIsRowModalVisible(false);
     },
     onError: () => {
@@ -205,7 +195,9 @@ const CustomerJourneyMap: React.FC = () => {
     onSuccess: () => {
       message.success("Cell updated successfully");
       setIsCellModalVisible(false);
-      fetchCustomerJourneyMap();
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEY.GROUP_CUSTOMER_JOURNEY_MAP],
+      });
     },
     onError: () => {
       message.error("Failed to update cell.");
@@ -230,6 +222,9 @@ const CustomerJourneyMap: React.FC = () => {
       if (data.data?.message) {
         message.success(data.data?.message);
       }
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEY.GROUP_CUSTOMER_JOURNEY_MAP],
+      });
     },
     onError: () => {
       message.error("Failed to add row.");
@@ -237,8 +232,8 @@ const CustomerJourneyMap: React.FC = () => {
   });
 
   const getContentForCell = (rowId: string, colId: string) => {
-    const cell = customerJourneyData.cells.find(
-      (cell) => cell.row === rowId && cell.col === colId
+    const cell = customerJourneyMapData?.data?.data?.customerJourneyMap?.cells.find(
+      (cell: any) => cell.row === rowId && cell.col === colId
     );
     return cell ? cell.content : "No content available";
   };
@@ -246,7 +241,9 @@ const CustomerJourneyMap: React.FC = () => {
   const handleAddColumn = () => {
     addColumnMutation.mutate(undefined, {
       onSuccess: () => {
-        fetchCustomerJourneyMap();
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEY.GROUP_CUSTOMER_JOURNEY_MAP],
+        });
         message.success("Column added successfully");
       },
       onError: () => {
@@ -273,7 +270,9 @@ const CustomerJourneyMap: React.FC = () => {
   const handleAddRow = () => {
     addRowMutation.mutate(undefined, {
       onSuccess: () => {
-        fetchCustomerJourneyMap();
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEY.GROUP_CUSTOMER_JOURNEY_MAP],
+        });
         message.success("Row added successfully");
       },
       onError: () => {
@@ -343,7 +342,6 @@ const CustomerJourneyMap: React.FC = () => {
       });
     }
   };
-
   return (
     <div className="bg-white p-4 w-full rounded-lg mb-6">
       <Title level={4} className="text-xl font-bold mb-5">
@@ -358,18 +356,21 @@ const CustomerJourneyMap: React.FC = () => {
             STAGE
           </Card>
         </div>
-        {customerJourneyData.cols.map((col) => (
-          <div className="flex-1" key={col._id}>
-            <Card
-              className="text-center font-semibold uppercase h-20 overflow-hidden"
-              style={{ backgroundColor: col.color }}
-              onClick={() => showEditColModal(col)}
-            >
-              {col.name}
-            </Card>
-          </div>
-        ))}
-        {customerJourneyData.cols.length < 7 && (
+        {customerJourneyMapData?.data?.data?.customerJourneyMap?.cols.map(
+          (col: any) => (
+            <div className="flex-1" key={col._id}>
+              <Card
+                className="text-center font-semibold uppercase h-20 overflow-hidden"
+                style={{ backgroundColor: col.color }}
+                onClick={() => showEditColModal(col)}
+              >
+                {col.name}
+              </Card>
+            </div>
+          )
+        )}
+        {customerJourneyMapData?.data?.data?.customerJourneyMap?.cols.length <
+          7 && (
           <div className="flex-1">
             <Card
               onClick={handleAddColumn}
@@ -380,62 +381,68 @@ const CustomerJourneyMap: React.FC = () => {
           </div>
         )}
       </div>
-      {customerJourneyData.rows.map((row, rowIndex) => (
-        <div className="flex my-1" key={row._id}>
-          <div className="flex-1">
-            <Card
-              className="text-center uppercase font-bold h-20 shadow items-center overflow-hidden"
-              onClick={() => showEditRowModal(row)}
-            >
-              {row.name}
-            </Card>
-          </div>
-          {customerJourneyData.cols.map((col) => (
-            <div className="flex-1" key={col._id}>
-              <Tooltip
-                overlayStyle={{
-                  whiteSpace: "normal",
-                }}
-                title={
-                  <span style={{ color: "#000000" }}>
-                    {getContentForCell(row._id, col._id)}
-                  </span>
-                }
-                placement="top"
-                color={col.color}
+      {customerJourneyMapData?.data?.data?.customerJourneyMap?.rows.map(
+        (row: any, rowIndex: any) => (
+          <div className="flex my-1" key={row._id}>
+            <div className="flex-1">
+              <Card
+                className="text-center uppercase font-bold h-20 shadow items-center overflow-hidden"
+                onClick={() => showEditRowModal(row)}
               >
-                <Card
-                  className="h-20 shadow"
-                  style={{
-                    backgroundColor: lightenColor(
-                      col.color,
-                      rowIndex % 2 === 0 ? 20 : 10
-                    ),
-                  }}
-                  onClick={() => {
-                    const cell = customerJourneyData.cells.find(
-                      (cell) => cell.row === row._id && cell.col === col._id
-                    );
-                    if (cell) {
-                      showEditCellModal(cell);
-                    }
-                  }}
-                >
-                  <div className="line-clamp-2">
-                    {getContentForCell(row._id, col._id)}
-                  </div>
-                </Card>
-              </Tooltip>
+                {row.name}
+              </Card>
             </div>
-          ))}
-          {customerJourneyData.cols.length < 7 && (
-            <div className="flex-1"></div>
-          )}
-        </div>
-      ))}
+            {customerJourneyMapData?.data?.data?.customerJourneyMap?.cols.map(
+              (col: any) => (
+                <div className="flex-1" key={col._id}>
+                  <Tooltip
+                    overlayStyle={{
+                      whiteSpace: "normal",
+                    }}
+                    title={
+                      <span style={{ color: "#000000" }}>
+                        {getContentForCell(row._id, col._id)}
+                      </span>
+                    }
+                    placement="top"
+                    color={col.color}
+                  >
+                    <Card
+                      className="h-20 shadow"
+                      style={{
+                        backgroundColor: lightenColor(
+                          col.color,
+                          rowIndex % 2 === 0 ? 20 : 10
+                        ),
+                      }}
+                      onClick={() => {
+                        const cell =
+                          customerJourneyMapData?.data?.data?.customerJourneyMap?.cells.find(
+                            (cell: any) =>
+                              cell.row === row._id && cell.col === col._id
+                          );
+                        if (cell) {
+                          showEditCellModal(cell);
+                        }
+                      }}
+                    >
+                      <div className="line-clamp-2">
+                        {getContentForCell(row._id, col._id)}
+                      </div>
+                    </Card>
+                  </Tooltip>
+                </div>
+              )
+            )}
+            {customerJourneyMapData?.data?.data?.customerJourneyMap?.cols
+              .length < 7 && <div className="flex-1"></div>}
+          </div>
+        )
+      )}
 
       <div className="flex my-1">
-        {customerJourneyData.rows.length < 7 && (
+        {customerJourneyMapData?.data?.data?.customerJourneyMap?.rows.length <
+          7 && (
           <div className="flex-1">
             <Card
               onClick={handleAddRow}
@@ -445,9 +452,11 @@ const CustomerJourneyMap: React.FC = () => {
             </Card>
           </div>
         )}
-        {customerJourneyData.cols.map((col) => (
-          <div className="flex-1" key={col._id}></div>
-        ))}
+        {customerJourneyMapData?.data?.data?.customerJourneyMap?.cols.map(
+          (col: any) => (
+            <div className="flex-1" key={col._id}></div>
+          )
+        )}
         <div className="flex-1"></div>
       </div>
       <Modal
