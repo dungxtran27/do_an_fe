@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { TASK_FILTERS, TASK_STATUS_FILTER } from "../../../../utils/const";
+import {
+  QUERY_KEY,
+  TASK_FILTERS,
+  TASK_STATUS_FILTER,
+} from "../../../../utils/const";
 import { Button, Form, Input, Select, Tooltip } from "antd";
 import styles from "./styles.module.scss";
 import FormItem from "antd/es/form/FormItem";
@@ -8,11 +12,42 @@ import { FaFileExcel } from "react-icons/fa6";
 import TaskBoard from "./TaskBoard";
 import classNames from "classnames";
 import CreateTask from "./CreateTask";
+import { useQuery } from "@tanstack/react-query";
+import { taskBoard } from "../../../../api/Task/taskBoard";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../../redux/store";
+import { UserInfo } from "../../../../model/auth";
 // type LabelRender = SelectProps["labelRender"];
 const Task = () => {
+  const userInfo = useSelector(
+    (state: RootState) => state.auth.userInfo
+  ) as UserInfo | null;
+  const [form] = Form.useForm();
+  const taskType = Form.useWatch(TASK_FILTERS.taskType, form);
+  const assignee = Form.useWatch(TASK_FILTERS.assignee, form);
+  const searchKey = Form.useWatch(TASK_FILTERS.searchKey, form);
+  const groupId = userInfo?.group ?? "";
   const [status, setStatus] = useState<string>("All");
   const [memberSearch, setMemberSearch] = useState<string>("");
   const [openCreateTask, setOpenCreateTask] = useState<boolean>(false);
+  const { data: taskBoardData, isLoading } = useQuery({
+    queryKey: [
+      QUERY_KEY.TASKS_BOARD,
+      groupId,
+      assignee,
+      taskType,
+      searchKey,
+      status,
+    ],
+    queryFn: async () => {
+      return taskBoard.getGroupTask(groupId, {
+        assignee: assignee,
+        taskType: taskType,
+        searchKey: searchKey,
+        status: status,
+      });
+    },
+  });
   const statusFilter = () => {
     return (
       <div className="flex items-center text gap-5">
@@ -24,10 +59,6 @@ const Task = () => {
               className={`${
                 status === s.value ? "text-white bg-primary" : ``
               } px-5 py-1 text-center rounded-full cursor-pointer`}
-              //   style={{
-              //     backgroundColor: status === s.value ? s.color : "transparent",
-              //     color: status === s.value ? "white" : s.color,
-              //   }}
               onClick={() => {
                 setStatus(s.value);
               }}
@@ -39,18 +70,10 @@ const Task = () => {
       </div>
     );
   };
-  const [form] = Form.useForm();
-  // const taskType = Form.useWatch(TASK_FILTERS.taskType, form);
-  // const assignee = Form.useWatch(TASK_FILTERS.assignee, form);
-  // const searchKey = Form.useWatch(TASK_FILTERS.searchKey, form);
-
   const taskFilter = () => {
     const members = [
-      { value: "chuson", label: "Chu Son" },
-      { value: "trandung", label: "trandung" },
-      { value: "huy", label: "huy" },
-      { value: "hieu", label: "hieu" },
-      { value: "thang", label: "thang" },
+      { value: "670ab22e04859aef99b3e5c6", label: "Chu Son" },
+      { value: "66f501c8403a9f75c86092c7", label: "trandung" },
     ];
 
     return (
@@ -65,8 +88,8 @@ const Task = () => {
             style={{ width: 180 }}
             allowClear
             options={[
-              { value: "classwork", label: "Class work" },
-              { value: "grouptask", label: "Group task" },
+              { value: "Class work", label: "Class work" },
+              { value: "Group task", label: "Group task" },
             ]}
           />
         </FormItem>
@@ -100,29 +123,6 @@ const Task = () => {
       </Form>
     );
   };
-  const taskBoardData = [
-    {
-      key: "1",
-      taskType: "Group Task",
-      name: "Tạo timeline cho marketing",
-      assignee: {
-        color: "#e11d48",
-        name: "Sơn Chu",
-      },
-      status: "In Progress",
-      dueDate: new Date(),
-    },
-    {
-      key: "2",
-      taskType: "Class Task",
-      name: "Outcome 2",
-      assignee: {
-        color: "#fb923c",
-        name: "Trần Dũng",
-      },
-      status: "Need Review",
-    },
-  ];
   return (
     <div>
       {statusFilter()}
@@ -135,8 +135,9 @@ const Task = () => {
       </div>
       <div className={classNames(styles.taskBoard)}>
         <TaskBoard
-          taskBoardData={taskBoardData}
+          taskBoardData={taskBoardData?.data?.data || []}
           setOpenCreateTask={setOpenCreateTask}
+          isLoading={isLoading}
         />
       </div>
       <CreateTask open={openCreateTask} setOpen={setOpenCreateTask} />

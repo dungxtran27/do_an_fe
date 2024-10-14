@@ -1,18 +1,45 @@
-import { Select, Table, Tooltip } from "antd";
+import { Select, Skeleton, Table, Tooltip } from "antd";
 import dayjs from "dayjs";
-import { TASK_STATUS_FILTER } from "../../../../../utils/const";
+import { QUERY_KEY, TASK_STATUS_FILTER } from "../../../../../utils/const";
 import { CiSquarePlus } from "react-icons/ci";
-import { TaskBoardData } from "../../../../../model/taskBoard";
+// import { TaskBoardData } from "../../../../../model/taskBoard";
 import React from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { taskBoard } from "../../../../../api/Task/taskBoard";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../../../redux/store";
+import { UserInfo } from "../../../../../model/auth";
 // import { Link } from "react-router-dom";
 interface TaskBoardProps {
-  taskBoardData: TaskBoardData[];
+  taskBoardData: any; //TaskBoardData[];
   setOpenCreateTask: (open: boolean) => void;
+  isLoading: boolean;
+}
+interface UpdateTaskProps {
+  groupId: string;
+  taskId: string;
+  status: string;
 }
 const TaskBoard: React.FC<TaskBoardProps> = ({
   taskBoardData,
   setOpenCreateTask,
+  isLoading,
 }) => {
+  const userInfo = useSelector(
+    (state: RootState) => state.auth.userInfo
+  ) as UserInfo | null;
+
+  const groupId = userInfo?.group ?? "";
+  const queryClient = useQueryClient();
+  const updateTaskStatus = useMutation({
+    mutationFn: ({ groupId, taskId, status }: UpdateTaskProps) =>
+      taskBoard.updateTask(groupId, taskId, {
+        status: status,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY.TASKS_BOARD] });
+    },
+  });
   const labelRender = (status: string) => {
     const selectedTimeBlockColor = TASK_STATUS_FILTER.find(
       (tb) => tb.value === status
@@ -32,7 +59,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({
     }
     return <span>No option match</span>;
   };
-  const statusSelect = (status: string) => {
+  const statusSelect = (status: string, taskId: string) => {
     return (
       <Select
         options={TASK_STATUS_FILTER.filter((t) => t.value !== "All")}
@@ -47,28 +74,41 @@ const TaskBoard: React.FC<TaskBoardProps> = ({
             <span>{op.data.label}</span>
           </div>
         )}
+        onChange={(value) => {
+          updateTaskStatus.mutate({ status: value, taskId, groupId: groupId });
+        }}
         labelRender={() => (labelRender ? labelRender(status) : null)}
         defaultValue={status}
       />
     );
   };
-  const dataSource = taskBoardData.map((tb) => {
+
+  const dataSource = taskBoardData.map((tb: any) => {
     return {
-      key: tb.key,
-      taskType: tb.taskType,
-      name: tb.name,
+      key: tb?._id,
+      taskType: tb?.taskType,
+      name: tb?.taskName,
       assignee: (
         <div className="flex items-center gap-2 font-semibold">
-          <span
-            className="rounded-full w-7 text-center leading-7 text-white aspect-square"
-            style={{ backgroundColor: tb?.assignee?.color }} // Inline dynamic style
-          >
-            SC
-          </span>
+          {tb?.assignee?.account?.profilePicture ? (
+            <img
+              src={tb?.assignee?.account?.profilePicture}
+              className="rounded-full w-7 border border-primary aspect-square"
+            />
+          ) : (
+            <span
+              className="rounded-full w-7 text-center leading-7 text-white aspect-square"
+              style={{
+                backgroundColor: "#ef4444",
+              }}
+            >
+              SC
+            </span>
+          )}
           <span>{tb?.assignee?.name}</span>
         </div>
       ),
-      status: statusSelect(tb?.status),
+      status: statusSelect(tb?.status, tb?._id),
       dueDate: tb?.dueDate ? dayjs(tb?.dueDate).format("MMM D, YYYY") : "",
     };
   });
@@ -84,7 +124,11 @@ const TaskBoard: React.FC<TaskBoardProps> = ({
       dataIndex: "name",
       key: "name",
       className: "w-2/6",
-      render: (text:string) => <strong className="hover:underline hover:text-sky-500 cursor-pointer">{text}</strong>,
+      render: (text: string) => (
+        <strong className="hover:underline hover:text-sky-500 cursor-pointer">
+          {text}
+        </strong>
+      ),
     },
     {
       title: "Assignee",
@@ -106,20 +150,27 @@ const TaskBoard: React.FC<TaskBoardProps> = ({
     },
   ];
   return (
-    <Table
-      dataSource={dataSource}
-      columns={columns}
-      className="tableStriped"
-      footer={() => (
-        <div
-          className="flex items-center gap-5 cursor-pointer"
-          onClick={() => setOpenCreateTask(true)}
-        >
-          <CiSquarePlus size={20} />
-          Create Task
-        </div>
+    <div>
+      {isLoading ? (
+        <Skeleton active className="mt-5"/>
+      ) : (
+        <Table
+          dataSource={dataSource}
+          columns={columns}
+          className="tableStriped"
+          footer={() => (
+            <div
+              className="flex items-center gap-5 cursor-pointer"
+              onClick={() => setOpenCreateTask(true)}
+            >
+              <CiSquarePlus size={20} />
+              Create Task
+            </div>
+          )}
+          pagination={false}
+        />
       )}
-    />
+    </div>
   );
 };
 export default TaskBoard;
